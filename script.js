@@ -147,7 +147,47 @@ const loveLines = [
   "你是不是红豆？因为一见你我就开始相思。",
   "我想给你寄一箱蜜桃，顺便把我这颗心也打包。",
   "你像村口新修的路，平平坦坦通向我的未来。",
-  "我今天去存钱了，存的什么？存一辈子喜欢你。"
+  "我今天去存钱了，存的什么？存一辈子喜欢你。",
+  "歌歌一出现，小张的心就像村口喇叭，滋啦一声开始广播喜欢。",
+  "小张今天去赶集，没买葱姜蒜，只买了一麻袋想歌歌。",
+  "歌歌像小卖部最后一根烤肠，小张看一眼就走不动道。",
+  "小张不是恋爱脑，是歌歌牌电饭煲，一通电就冒粉红泡。",
+  "歌歌问小张土不土，小张说：土，但这块地只种你。",
+  "小张的心像拖拉机，见到歌歌就突突突开进幸福村。",
+  "歌歌像夜市灯牌，小张像迷路飞蛾，土归土，真往你那扑。",
+  "小张今天去修水管，修着修着发现心里漏的全是歌歌。",
+  "歌歌一笑，小张的 CPU 直接变成红糖糍粑，黏糊又发烫。",
+  "小张想给歌歌办张月卡，项目叫每天被偏爱一次。",
+  "歌歌像村口新铺的柏油路，小张一脚踩上去就想走到白头。",
+  "小张不是嘴笨，是一看见歌歌，普通话自动切换成心动方言。",
+  "歌歌像一袋跳跳糖，小张还没拆封，心里已经噼里啪啦。",
+  "小张今天去买锁，老板问锁啥，小张说锁歌歌的开心。",
+  "歌歌是小张的土味宇宙中心，连拖拉机都绕着你公转。",
+  "小张想做歌歌的保温壶，土是土点，但热乎一整天。",
+  "歌歌像早市第一笼包子，小张隔着三条街都能闻到心动。",
+  "小张不是在发呆，是脑袋里有个歌歌小剧场正在连播。",
+  "歌歌一眨眼，小张心里的秧苗就蹭蹭长成恋爱稻田。",
+  "小张对歌歌的喜欢像农村席面，菜一道接一道，根本停不下来。",
+  "歌歌像糖蒜，听着离谱，但小张越品越上头。",
+  "小张想给歌歌发红包，金额是 520，备注是村口认证喜欢。",
+  "歌歌是小张心里的招牌菜，菜名叫看一眼就傻笑。",
+  "小张见到歌歌，心动像煤气灶，啪一下就蓝火全开。",
+  "歌歌像一张小票，小张想折好放兜里，天天拿出来偷笑。",
+  "小张的喜欢不高冷，是搪瓷缸子泡麦乳精，甜得很实在。",
+  "歌歌一上线，小张的心就像老电视调台，雪花屏里全是你。",
+  "小张想和歌歌去压马路，压着压着把一条土路压成爱情高速。",
+  "歌歌像村口最靓的红灯笼，小张一抬头就觉得日子红火。",
+  "小张不是抽象，是喜欢歌歌喜欢到灵魂开始扭秧歌。",
+  "歌歌像一口大铁锅，小张这颗心一进去就被翻炒入味。",
+  "小张今天去种地，种的不是玉米，是对歌歌的死心塌地。",
+  "歌歌是小张的快乐批发市场，一见你，开心直接进货一车。",
+  "小张想把歌歌设成村规民约第一条：每天都要被好好喜欢。",
+  "歌歌像冰柜里的老冰棍，小张看着看着，心就甜化了。",
+  "小张对歌歌的爱像大喇叭试音：喂喂喂，听见了吗，我喜欢你。",
+  "歌歌是小张的导航语音，前方 10 米，进入心动路段。",
+  "小张想做歌歌家门口的路灯，不浪漫但准时为你亮。",
+  "歌歌像一碗胡辣汤，小张喝一口，心里热闹得像赶庙会。",
+  "小张的心不是水泥地，但歌歌一来，喜欢就硬化成永久工程。"
 ];
 
 const earthyTags = [
@@ -184,6 +224,7 @@ const heartTags = [
 
 const burstEmojis = ["💗", "💖", "💘", "💕", "🌸", "🌷", "✨"];
 const floatEmojis = ["💗", "💕", "💖", "🌸", "🍬", "📣"];
+const customNicknamePattern = /歌歌|小张/;
 
 const loveLineEl = document.querySelector("#loveLine");
 const earthyTagEl = document.querySelector("#earthyTag span:last-child");
@@ -227,7 +268,7 @@ function refreshTags() {
 
 function showLine(animated = true) {
   const update = () => {
-    currentIndex = nextIndex();
+    currentIndex = currentIndex === -1 ? nextNicknameIndex() : nextIndex();
     loveLineEl.textContent = loveLines[currentIndex];
     refreshTags();
     loveLineEl.classList.remove("switching");
@@ -240,6 +281,18 @@ function showLine(animated = true) {
 
   loveLineEl.classList.add("switching");
   window.setTimeout(update, 170);
+}
+
+function nextNicknameIndex() {
+  const customIndexes = loveLines
+    .map((line, index) => (customNicknamePattern.test(line) ? index : -1))
+    .filter((index) => index >= 0);
+
+  if (customIndexes.length === 0) {
+    return nextIndex();
+  }
+
+  return pickRandom(customIndexes);
 }
 
 function showToast(message) {
