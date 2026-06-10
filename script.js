@@ -245,6 +245,7 @@ let musicContext;
 let musicTimer;
 let isMusicPlaying = false;
 let isFallbackMusic = false;
+let isWaitingForMusicGesture = false;
 let noteCursor = 0;
 
 function pickRandom(list) {
@@ -402,10 +403,7 @@ function playMusicStep() {
 
 async function toggleMusic() {
   isMusicPlaying = !isMusicPlaying;
-  musicToggle.classList.toggle("is-playing", isMusicPlaying);
-  musicToggle.setAttribute("aria-pressed", String(isMusicPlaying));
-  musicToggle.setAttribute("aria-label", isMusicPlaying ? "暂停背景音乐" : "播放背景音乐");
-  musicToggle.querySelector("i").className = isMusicPlaying ? "fa-solid fa-volume-high" : "fa-solid fa-music";
+  updateMusicButton();
 
   if (isMusicPlaying) {
     await startMusic();
@@ -414,12 +412,20 @@ async function toggleMusic() {
   }
 }
 
+function updateMusicButton() {
+  musicToggle.classList.toggle("is-playing", isMusicPlaying);
+  musicToggle.setAttribute("aria-pressed", String(isMusicPlaying));
+  musicToggle.setAttribute("aria-label", isMusicPlaying ? "暂停背景音乐" : "播放背景音乐");
+  musicToggle.querySelector("i").className = isMusicPlaying ? "fa-solid fa-volume-high" : "fa-solid fa-music";
+}
+
 async function startMusic() {
   if (bgMusic) {
     try {
       bgMusic.volume = 0.42;
       await bgMusic.play();
       isFallbackMusic = false;
+      isWaitingForMusicGesture = false;
       showToast("背景音乐已开启：《今天你要嫁给我》");
       return;
     } catch {
@@ -444,6 +450,36 @@ function pauseMusic() {
 
   window.clearTimeout(musicTimer);
   showToast(isFallbackMusic ? "备用旋律已暂停" : "背景音乐已暂停");
+}
+
+async function tryAutoplayMusic() {
+  isMusicPlaying = true;
+  updateMusicButton();
+
+  try {
+    await startMusic();
+  } catch {
+    isMusicPlaying = false;
+    updateMusicButton();
+  }
+
+  if (bgMusic && bgMusic.paused && !isFallbackMusic) {
+    isMusicPlaying = false;
+    updateMusicButton();
+    isWaitingForMusicGesture = true;
+    showToast("点击页面任意位置开启背景音乐");
+  }
+}
+
+async function resumeMusicAfterGesture() {
+  if (!isWaitingForMusicGesture) {
+    return;
+  }
+
+  isWaitingForMusicGesture = false;
+  isMusicPlaying = true;
+  updateMusicButton();
+  await startMusic();
 }
 
 async function copyCurrentLine() {
@@ -499,3 +535,5 @@ totalCountEl.textContent = loveLines.length;
 showLine(false);
 spawnFloatingHeart();
 window.setInterval(spawnFloatingHeart, 720);
+window.addEventListener("load", tryAutoplayMusic);
+document.addEventListener("pointerdown", resumeMusicAfterGesture, { once: false });
