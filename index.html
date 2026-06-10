@@ -20,19 +20,22 @@
     <div class="floating-layer" id="floatingLayer" aria-hidden="true"></div>
     <main class="app-shell">
       <section class="hero-card" id="mainCard" aria-label="土味情话随机生成器">
+        <div class="corner-sticker left" aria-hidden="true">村口热播</div>
+        <div class="corner-sticker right" aria-hidden="true">甜度拉满</div>
         <header class="title-block">
           <div class="logo-badge" aria-hidden="true">
             <i class="fa-solid fa-heart"></i>
           </div>
           <div>
             <h1>土味情话补给站</h1>
-            <p>一键领取今日份甜度超标文案</p>
+            <p>小卖部同款浪漫，点击即刻出摊</p>
           </div>
         </header>
 
         <article class="quote-panel" aria-live="polite">
           <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
           <p class="love-line" id="loveLine"></p>
+          <div class="quote-stamp" aria-hidden="true">包甜</div>
         </article>
 
         <div class="tag-row" aria-label="趣味指数">
@@ -62,7 +65,7 @@
             <i class="fa-solid fa-database" aria-hidden="true"></i>
             情话库共 <strong id="totalCount">0</strong> 句
           </span>
-          <span id="hintText">双击卡片，解锁隐藏心动信号</span>
+          <span id="hintText">双击卡片，触发村口心动广播</span>
         </footer>
       </section>
     </main>
