@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>土味情话补给站</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Quicksand:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="floating-layer" id="floatingLayer" aria-hidden="true"></div>
+    <main class="app-shell">
+      <section class="hero-card" id="mainCard" aria-label="土味情话随机生成器">
+        <header class="title-block">
+          <div class="logo-badge" aria-hidden="true">
+            <i class="fa-solid fa-heart"></i>
+          </div>
+          <div>
+            <h1>土味情话补给站</h1>
+            <p>一键领取今日份甜度超标文案</p>
+          </div>
+        </header>
+
+        <article class="quote-panel" aria-live="polite">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="love-line" id="loveLine"></p>
+        </article>
+
+        <div class="tag-row" aria-label="趣味指数">
+          <span class="tag-pill hot" id="earthyTag">
+            <i class="fa-solid fa-fire-flame-curved" aria-hidden="true"></i>
+            <span>土味指数</span>
+          </span>
+          <span class="tag-pill sweet" id="heartTag">
+            <i class="fa-solid fa-heart-pulse" aria-hidden="true"></i>
+            <span>心动值</span>
+          </span>
+        </div>
+
+        <div class="action-row">
+          <button class="primary-action" id="shuffleBtn" type="button">
+            <i class="fa-solid fa-shuffle" aria-hidden="true"></i>
+            <span>换一句土味情话</span>
+          </button>
+          <button class="secondary-action" id="copyBtn" type="button">
+            <i class="fa-regular fa-copy" aria-hidden="true"></i>
+            <span>复制·撩TA</span>
+          </button>
+        </div>
+
+        <footer class="stats-bar">
+          <span>
+            <i class="fa-solid fa-database" aria-hidden="true"></i>
+            情话库共 <strong id="totalCount">0</strong> 句
+          </span>
+          <span id="hintText">双击卡片，解锁隐藏心动信号</span>
+        </footer>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./script.js"></script>
+  </body>
+</html>
