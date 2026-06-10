@@ -195,9 +195,14 @@ const mainCard = document.querySelector("#mainCard");
 const floatingLayer = document.querySelector("#floatingLayer");
 const toast = document.querySelector("#toast");
 const hintText = document.querySelector("#hintText");
+const musicToggle = document.querySelector("#musicToggle");
 
 let currentIndex = -1;
 let toastTimer;
+let musicContext;
+let musicTimer;
+let isMusicPlaying = false;
+let noteCursor = 0;
 
 function pickRandom(list) {
   return list[Math.floor(Math.random() * list.length)];
@@ -288,6 +293,80 @@ function spawnFloatingHeart() {
   heart.addEventListener("animationend", () => heart.remove(), { once: true });
 }
 
+function ensureMusicContext() {
+  if (!musicContext) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    musicContext = new AudioContext();
+  }
+
+  return musicContext;
+}
+
+function playNote(frequency, startTime, duration, type = "sine", volume = 0.045) {
+  const context = ensureMusicContext();
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, startTime);
+  gain.gain.setValueAtTime(0.0001, startTime);
+  gain.gain.exponentialRampToValueAtTime(volume, startTime + 0.035);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+  oscillator.connect(gain);
+  gain.connect(context.destination);
+  oscillator.start(startTime);
+  oscillator.stop(startTime + duration + 0.04);
+}
+
+function playMusicStep() {
+  if (!isMusicPlaying || !musicContext) {
+    return;
+  }
+
+  const melody = [
+    523.25, 659.25, 783.99, 659.25,
+    587.33, 659.25, 523.25, 392.0,
+    440.0, 523.25, 659.25, 587.33,
+    523.25, 440.0, 392.0, 523.25
+  ];
+  const bass = [261.63, 329.63, 349.23, 392.0];
+  const now = musicContext.currentTime + 0.02;
+  const note = melody[noteCursor % melody.length];
+  const bassNote = bass[Math.floor(noteCursor / 4) % bass.length];
+
+  playNote(note, now, 0.38, "sine", 0.042);
+
+  if (noteCursor % 4 === 0) {
+    playNote(bassNote, now, 0.72, "triangle", 0.025);
+  }
+
+  noteCursor += 1;
+  musicTimer = window.setTimeout(playMusicStep, 420);
+}
+
+async function toggleMusic() {
+  const context = ensureMusicContext();
+
+  if (context.state === "suspended") {
+    await context.resume();
+  }
+
+  isMusicPlaying = !isMusicPlaying;
+  musicToggle.classList.toggle("is-playing", isMusicPlaying);
+  musicToggle.setAttribute("aria-pressed", String(isMusicPlaying));
+  musicToggle.setAttribute("aria-label", isMusicPlaying ? "暂停背景音乐" : "播放背景音乐");
+  musicToggle.querySelector("i").className = isMusicPlaying ? "fa-solid fa-volume-high" : "fa-solid fa-music";
+
+  if (isMusicPlaying) {
+    showToast("背景音乐已开启");
+    playMusicStep();
+  } else {
+    window.clearTimeout(musicTimer);
+    showToast("背景音乐已暂停");
+  }
+}
+
 async function copyCurrentLine() {
   const text = loveLines[currentIndex] || loveLineEl.textContent.trim();
 
@@ -316,6 +395,11 @@ shuffleBtn.addEventListener("click", () => {
 copyBtn.addEventListener("click", async () => {
   burstFromElement(copyBtn, 20);
   await copyCurrentLine();
+});
+
+musicToggle.addEventListener("click", async () => {
+  burstFromElement(musicToggle, 10);
+  await toggleMusic();
 });
 
 mainCard.addEventListener("dblclick", (event) => {

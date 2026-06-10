@@ -54,6 +54,41 @@ button {
   font: inherit;
 }
 
+.music-toggle {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 12;
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  border: 3px solid #7a3422;
+  border-radius: 50%;
+  color: #5f240e;
+  background: linear-gradient(135deg, #fff7c0, #ffc56f);
+  box-shadow: 0 7px 0 rgba(107, 52, 31, 0.2);
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.music-toggle:hover {
+  transform: translateY(-2px) rotate(-4deg);
+  filter: saturate(1.08);
+}
+
+.music-toggle:active {
+  transform: translateY(3px);
+  box-shadow: 0 4px 0 rgba(107, 52, 31, 0.22);
+}
+
+.music-toggle.is-playing {
+  color: #fff9d6;
+  background: linear-gradient(135deg, var(--tomato), var(--rose));
+  text-shadow: 1px 1px 0 rgba(107, 52, 31, 0.42);
+  animation: musicPulse 1150ms ease-in-out infinite;
+}
+
 .floating-layer {
   position: fixed;
   inset: 0;
@@ -439,7 +474,24 @@ h1 {
   }
 }
 
+@keyframes musicPulse {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-2px) rotate(6deg);
+  }
+}
+
 @media (max-width: 620px) {
+  .music-toggle {
+    top: 12px;
+    right: 12px;
+    width: 46px;
+    height: 46px;
+  }
+
   .app-shell {
     align-items: start;
     padding-top: 24px;
