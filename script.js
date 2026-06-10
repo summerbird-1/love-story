@@ -237,12 +237,14 @@ const floatingLayer = document.querySelector("#floatingLayer");
 const toast = document.querySelector("#toast");
 const hintText = document.querySelector("#hintText");
 const musicToggle = document.querySelector("#musicToggle");
+const bgMusic = document.querySelector("#bgMusic");
 
 let currentIndex = -1;
 let toastTimer;
 let musicContext;
 let musicTimer;
 let isMusicPlaying = false;
+let isFallbackMusic = false;
 let noteCursor = 0;
 
 function pickRandom(list) {
@@ -399,12 +401,6 @@ function playMusicStep() {
 }
 
 async function toggleMusic() {
-  const context = ensureMusicContext();
-
-  if (context.state === "suspended") {
-    await context.resume();
-  }
-
   isMusicPlaying = !isMusicPlaying;
   musicToggle.classList.toggle("is-playing", isMusicPlaying);
   musicToggle.setAttribute("aria-pressed", String(isMusicPlaying));
@@ -412,12 +408,42 @@ async function toggleMusic() {
   musicToggle.querySelector("i").className = isMusicPlaying ? "fa-solid fa-volume-high" : "fa-solid fa-music";
 
   if (isMusicPlaying) {
-    showToast("背景音乐已开启");
-    playMusicStep();
+    await startMusic();
   } else {
-    window.clearTimeout(musicTimer);
-    showToast("背景音乐已暂停");
+    pauseMusic();
   }
+}
+
+async function startMusic() {
+  if (bgMusic) {
+    try {
+      bgMusic.volume = 0.42;
+      await bgMusic.play();
+      isFallbackMusic = false;
+      showToast("背景音乐已开启：《今天你要嫁给我》");
+      return;
+    } catch {
+      isFallbackMusic = true;
+      showToast("未找到授权音频，已切换备用旋律");
+    }
+  }
+
+  const context = ensureMusicContext();
+
+  if (context.state === "suspended") {
+    await context.resume();
+  }
+
+  playMusicStep();
+}
+
+function pauseMusic() {
+  if (bgMusic) {
+    bgMusic.pause();
+  }
+
+  window.clearTimeout(musicTimer);
+  showToast(isFallbackMusic ? "备用旋律已暂停" : "背景音乐已暂停");
 }
 
 async function copyCurrentLine() {
